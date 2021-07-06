@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "sfluent",
     platforms: [
-        .macOS(.v11), .iOS(.v13)
+        .macOS(.v10_10), .iOS(.v10)
     ],
     products: [
         .library(
