@@ -5,7 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "sfluent",
-    
+    platforms: [
+        .macOS(.v11), .iOS(.v13)
+    ],
     products: [
         .library(
             name: "sfluent",
@@ -24,5 +26,6 @@ let package = Package(
         .testTarget(
             name: "sfluentTests",
             dependencies: ["sfluent"]),
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )
