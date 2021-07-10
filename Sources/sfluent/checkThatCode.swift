@@ -27,13 +27,14 @@ import XCTest
 */
 public func checkThatCode(_ that: @escaping () throws -> Void) -> Checkable<() throws ->Void> {
         let systemUnderTest = that
-        return Checkable<() throws ->Void>(value: systemUnderTest)
+        return Checkable<() throws ->Void>(systemUnderTest)
 }
 
 
 public extension Checkable where T == () throws -> Void {
-    func willThrowAnError() {
+    func willThrowAnError() -> CheckedResult<T>{
         XCTAssertThrowsError(try value())
+        return CheckedResult<T>(self.value)
     }
 }
 
@@ -42,3 +43,6 @@ public extension Checkable where T == () throws -> Void {
         XCTAssertNoThrow(try value(), "this code was not expected to throw an error but it was")
     }
 }
+
+
+

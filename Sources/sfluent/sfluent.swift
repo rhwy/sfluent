@@ -2,27 +2,28 @@ import XCTest
 
 public func check<T>(that: T) -> Checkable<T> {
         let systemUnderTest = that
-        return Checkable<T>(value: systemUnderTest)
+        return Checkable<T>(systemUnderTest)
 }
 
-
-public struct Checkable<T> {
+public protocol CheckProtocol {}
+public struct Checkable<T> : CheckProtocol {
     var value: T
-    init(value: T) {
+    init(_ value: T) {
         self.value = value
     }
 }
 
-
-public extension Checkable where T == Int {
-    func isGreaterThanZero() {
-        XCTAssertGreaterThan(value,0)
+public struct CheckedResult<T>: CheckProtocol{
+    public var and: CheckedResult<T> {
+        return self
     }
+    var value: T
+    init(_ value: T) {
+        self.value = value
+    }
+    
 }
 
-public extension Checkable where T == String {
-    func isNotEmpty() {
-        XCTAssertNotNil(value)
-        XCTAssertGreaterThan(value.count,0)
-    }
+public protocol Continuable {
+    associatedtype and: Continuable,CheckProtocol
 }
