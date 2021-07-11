@@ -8,6 +8,8 @@
 import Foundation
 import XCTest
 
+extension String : Error {}
+
 /**
     # Check that code
 
@@ -32,17 +34,97 @@ public func checkThatCode(_ that: @escaping () throws -> Void) -> Checkable<() t
 
 
 public extension Checkable where T == () throws -> Void {
-    func willThrowAnError() -> CheckedResult<T>{
-        XCTAssertThrowsError(try value())
-        return CheckedResult<T>(self.value)
+    @discardableResult func throwsAnError() throws -> CheckedResult<T>{
+        
+        let sutResult: CheckedResult<T>
+        do {
+            try value()
+            sutResult =  CheckedResult<T>(self.value)
+        } catch {
+            sutResult =  CheckedResult<T>(
+                self.value,
+                CheckError.ExecutedCode(error))
+        }
+        switch sutResult.error {
+        case .None:
+            throw CheckError.FailedTest(
+                CheckError.None,
+                "it was expected to throw an error but it didn'throws")
+            
+        default:
+            return sutResult
+        }
+
     }
 }
 
 public extension Checkable where T == () throws -> Void {
-    func willNotThrowAnError() {
-        XCTAssertNoThrow(try value(), "this code was not expected to throw an error but it was")
+    @discardableResult func dontThrowAnError() throws -> CheckedResult<T>{
+        let sutResult: CheckedResult<T>
+        do {
+            try value()
+            sutResult =  CheckedResult<T>(self.value)
+        } catch {
+            sutResult =  CheckedResult<T>(
+                self.value,
+                CheckError.ExecutedCode(error))
+        }
+        switch sutResult.error {
+        case .None:
+            return sutResult
+        default:
+            throw CheckError.FailedTest(sutResult.error, "it was not expected to throw an error but it throws")
+        }
+
     }
 }
 
+public extension CheckedResult where T == () throws -> Void {
+    func error(is: Error) {
+        let actual = self.error
+        let expected =  CheckError.ExecutedCode(`is`)
+        XCTAssertEqual(actual,expected)
+    }
+}
 
-
+public enum CheckError: Error,Equatable,CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .None:
+            return "None"
+        case .ExecutedCode(let err):
+            return String(describing: err)
+        case .FailedTest(CheckError.None, let msg):
+            let testMessage = """
+            ❌
+            \(msg)
+            """
+            return testMessage
+        case .FailedTest(let err, let msg):
+            let testMessage = """
+            ❌
+            \(msg) :
+            - \(String(describing: err))
+            """
+            return testMessage
+        }
+    }
+    
+    public static func == (lhs: CheckError, rhs: CheckError) -> Bool {
+        switch lhs {
+        case .ExecutedCode(let lvalue):
+            switch rhs {
+            case .ExecutedCode(let rvalue):
+                return String(describing: lvalue) == String(describing: rvalue)
+            default:
+                return false
+            }
+        default:
+            return false
+        }
+    }
+    
+    case None
+    case ExecutedCode(Error)
+    case FailedTest(Error,String)
+}

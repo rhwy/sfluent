@@ -18,12 +18,10 @@ public struct CheckedResult<T>: CheckProtocol{
         return self
     }
     var value: T
-    init(_ value: T) {
+    var error: CheckError
+    init(_ value: T, _ error: CheckError = CheckError.None) {
         self.value = value
+        self.error = error
     }
     
-}
-
-public protocol Continuable {
-    associatedtype and: Continuable,CheckProtocol
 }
