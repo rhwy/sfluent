@@ -9,7 +9,15 @@ import Foundation
 import XCTest
 
 public extension Checkable where T == Int {
-    func isGreaterThanZero() {
-        XCTAssertGreaterThan(value,0)
+    func isGreaterThanZero() throws {
+        if value <= 0 {
+            let message = """
+the actual integer [\(value)] was expected to be positive but it is not
+"""
+            throw CheckError.FailedTest(CheckError.None, message)
+        }
+        
     }
+    
+    
 }

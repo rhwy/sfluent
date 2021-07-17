@@ -13,14 +13,14 @@ extension String : Error {}
 /**
     # Check that code
 
-    It creates a **Checkable** expression around a closure you want to test
+    It creates a **Checkable** expression around a closure that you want to test
 
-     It is mainly used to check if an expression should throw errors or not
+     It is  used to check if an expression should throw errors or not
         
      ```swift
         checkThatCode {
            throw "it should fail!"
-        }.willThrowAnError()
+        }.throwsAnError()
     ```
  
     - parameters :
@@ -49,7 +49,7 @@ public extension Checkable where T == () throws -> Void {
         case .None:
             throw CheckError.FailedTest(
                 CheckError.None,
-                "it was expected to throw an error but it didn'throws")
+                "it was expected to throw an error but it didn't throws")
             
         default:
             return sutResult
@@ -80,10 +80,17 @@ public extension Checkable where T == () throws -> Void {
 }
 
 public extension CheckedResult where T == () throws -> Void {
-    func error(is: Error) {
+    func error(is: Error) throws {
         let actual = self.error
         let expected =  CheckError.ExecutedCode(`is`)
-        XCTAssertEqual(actual,expected)
+        if actual != expected {
+            let message = """
+            An error was catched as expected but it was not the expected one:
+            - actual   : \(actual)
+            - expected : \(expected)
+            """
+            throw CheckError.FailedTest(CheckError.None, message)
+        }
     }
 }
 
@@ -96,13 +103,13 @@ public enum CheckError: Error,Equatable,CustomStringConvertible {
             return String(describing: err)
         case .FailedTest(CheckError.None, let msg):
             let testMessage = """
-            ❌
+            === check fail ===
             \(msg)
             """
             return testMessage
         case .FailedTest(let err, let msg):
             let testMessage = """
-            ❌
+            === check fail ===
             \(msg) :
             - \(String(describing: err))
             """

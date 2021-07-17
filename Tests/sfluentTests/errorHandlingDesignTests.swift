@@ -21,6 +21,11 @@ final class WhenCheckingSomeCodeToExecute: XCTestCase {
                 //because we're supposed to throw and error and it we don't throw, it should catch that error
             }.throwsAnError()
         }.throwsAnError()
+        .and
+        .error(is: """
+=== check fail ===
+it was expected to throw an error but it didn't throws
+""")
         
     }
     
@@ -38,6 +43,12 @@ final class WhenCheckingSomeCodeToExecute: XCTestCase {
                 throw "you should not pass!"
             }.dontThrowAnError()
         }.throwsAnError()
+        .and
+        .error(is: """
+=== check fail ===
+it was not expected to throw an error but it throws :
+- you should not pass!
+""")
     }
     
     
@@ -48,6 +59,26 @@ final class WhenCheckingSomeCodeToExecute: XCTestCase {
         .throwsAnError()
         .and
         .error(is:"this should fail!")
+        
+    }
+    
+    func test_it_should_be_able_to_verify_the_error_message_inverted() throws {
+        try checkThatCode {
+            try checkThatCode {
+                throw "this should fail!"
+            }
+            .throwsAnError()
+            .and
+            .error(is:"this was wrong")
+        }
+        .throwsAnError()
+        .and
+        .error(is:"""
+            === check fail ===
+            An error was catched as expected but it was not the expected one:
+            - actual   : this should fail!
+            - expected : this was wrong
+            """)
         
     }
     
@@ -65,14 +96,6 @@ public enum FakeError : Error {
     case A, B
 }
 
-
-//design:
-//the check should return a checkresult
-//which should be also a linkable check that should
-//allow to continue with another check
-//here : .willThrowAnError().with(message:"this should fail")
-//the with is contextual to the type
-//the with carry the initial sut too
 
 
 
