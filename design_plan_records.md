@@ -1,7 +1,19 @@
 
 # design plan and decisions
 
-## For v0.0.6 [NEXT]
+## For v0.0.7 (20210715-)[NEXT]
+
+- [PLAN]
+    - investigate try/rethrows to see if we can have full control of our own tests exceptions without the need for throws/try in our tests calls to assertions (see notes)
+    - now that we have a better understanding and good shape of our first checks, try to create a builder for checks (first for the core tests but also as an extention point in the framework)
+    - start adding some comments to see the most useful format
+    
+    
+- [NOTES]
+    -  _"rethrows tells the compiler that the function only ever throws error thrown by one of its throwing input arguments. It never throws errors on its own". more on [link](https://stackoverflow.com/questions/43305051/what-are-the-differences-between-throws-and-rethrows-in-swift/43305215#43305215)_
+
+
+## For v0.0.6
 
 - [PLAN]
     - remove calls to XCTassert and only use custom errors and tests of the framework to remove dependency to the XCTest framework assertions

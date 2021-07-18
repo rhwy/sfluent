@@ -5,7 +5,10 @@ public func check<T>(that: T) -> Checkable<T> {
         return Checkable<T>(systemUnderTest)
 }
 
-public protocol CheckProtocol {}
+public protocol CheckProtocol {
+    
+}
+
 public struct Checkable<T> : CheckProtocol {
     var value: T
     init(_ value: T) {

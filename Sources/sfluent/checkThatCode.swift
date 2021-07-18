@@ -27,7 +27,7 @@ extension String : Error {}
         - that : the closure you want to test
  
 */
-public func checkThatCode(_ that: @escaping () throws -> Void) -> Checkable<() throws ->Void> {
+public func checkThatCode(_ that: @escaping () throws -> Void) rethrows -> Checkable<() throws ->Void> {
         let systemUnderTest = that
         return Checkable<() throws ->Void>(systemUnderTest)
 }
